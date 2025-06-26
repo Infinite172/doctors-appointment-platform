@@ -5,12 +5,13 @@ import { PricingTable } from "@clerk/nextjs";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import Pricing from "@/components/pricing";
+import Questions from "@/components/questions";
 
 export default async function PricingPage() {
   return (
     <div className="container mx-auto px-4 py-12">
       {/* Header Section */}
-      <div className="flex justify-start mb-2">
+      <div className="flex cursor-pointer justify-start mb-2">
         <Link
           href="/"
           className="flex items-center text-muted-foreground hover:text-white transition-colors"
@@ -25,7 +26,7 @@ export default async function PricingPage() {
           variant="outline"
           className="bg-emerald-900/30 border-emerald-700/30 px-4 py-1 text-emerald-400 text-sm font-medium mb-4"
         >
-          Affordable Healthcare
+          Affordable legal services
         </Badge>
 
         <h1 className="text-4xl md:text-5xl font-bold gradient-title mb-4">
@@ -33,8 +34,8 @@ export default async function PricingPage() {
         </h1>
 
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-          Choose the perfect consultation package that fits your healthcare
-          needs with no hidden fees or long-term commitments
+          Choose the perfect consultation package that resolve your legal
+          concerns with no hidden fees or long-term commitments
         </p>
       </div>
 
@@ -42,14 +43,7 @@ export default async function PricingPage() {
       <Pricing />
 
       {/* FAQ Section - Optional */}
-      <div className="max-w-3xl mx-auto mt-16 text-center">
-        <h2 className="text-2xl font-bold text-white mb-2">
-          Questions? We're Here to Help
-        </h2>
-        <p className="text-muted-foreground mb-4">
-          Contact our support team at support@medimeet.com
-        </p>
-      </div>
+      <Questions />
     </div>
   );
 }

@@ -29,16 +29,16 @@ export async function verifyAdmin() {
 }
 
 /**
- * Gets all doctors with pending verification
+ * Gets all lawyers with pending verification
  */
-export async function getPendingDoctors() {
+export async function getPendingLawyers() {
   const isAdmin = await verifyAdmin();
   if (!isAdmin) throw new Error("Unauthorized");
 
   try {
-    const pendingDoctors = await db.user.findMany({
+    const pendingLawyers = await db.user.findMany({
       where: {
-        role: "DOCTOR",
+        role: "LAWYER",
         verificationStatus: "PENDING",
       },
       orderBy: {
@@ -46,23 +46,23 @@ export async function getPendingDoctors() {
       },
     });
 
-    return { doctors: pendingDoctors };
+    return { lawyers: pendingLawyers };
   } catch (error) {
-    throw new Error("Failed to fetch pending doctors");
+    throw new Error("Failed to fetch pending lawyers");
   }
 }
 
 /**
- * Gets all verified doctors
+ * Gets all verified lawyers
  */
-export async function getVerifiedDoctors() {
+export async function getVerifiedLawyers() {
   const isAdmin = await verifyAdmin();
   if (!isAdmin) throw new Error("Unauthorized");
 
   try {
-    const verifiedDoctors = await db.user.findMany({
+    const verifiedLawyers = await db.user.findMany({
       where: {
-        role: "DOCTOR",
+        role: "LAWYER",
         verificationStatus: "VERIFIED",
       },
       orderBy: {
@@ -70,31 +70,31 @@ export async function getVerifiedDoctors() {
       },
     });
 
-    return { doctors: verifiedDoctors };
+    return { lawyers: verifiedLawyers };
   } catch (error) {
-    console.error("Failed to get verified doctors:", error);
-    return { error: "Failed to fetch verified doctors" };
+    console.error("Failed to get verified lawyers:", error);
+    return { error: "Failed to fetch verified lawyers" };
   }
 }
 
 /**
- * Updates a doctor's verification status
+ * Updates a lawyer's verification status
  */
-export async function updateDoctorStatus(formData) {
+export async function updateLawyerStatus(formData) {
   const isAdmin = await verifyAdmin();
   if (!isAdmin) throw new Error("Unauthorized");
 
-  const doctorId = formData.get("doctorId");
+  const lawyerId = formData.get("lawyerId");
   const status = formData.get("status");
 
-  if (!doctorId || !["VERIFIED", "REJECTED"].includes(status)) {
+  if (!lawyerId || !["VERIFIED", "REJECTED"].includes(status)) {
     throw new Error("Invalid input");
   }
 
   try {
     await db.user.update({
       where: {
-        id: doctorId,
+        id: lawyerId,
       },
       data: {
         verificationStatus: status,
@@ -104,23 +104,23 @@ export async function updateDoctorStatus(formData) {
     revalidatePath("/admin");
     return { success: true };
   } catch (error) {
-    console.error("Failed to update doctor status:", error);
-    throw new Error(`Failed to update doctor status: ${error.message}`);
+    console.error("Failed to update lawyer status:", error);
+    throw new Error(`Failed to update lawyer status: ${error.message}`);
   }
 }
 
 /**
- * Suspends or reinstates a doctor
+ * Suspends or reinstates a lawyer
  */
-export async function updateDoctorActiveStatus(formData) {
+export async function updateLawyerActiveStatus(formData) {
   const isAdmin = await verifyAdmin();
   if (!isAdmin) throw new Error("Unauthorized");
 
-  const doctorId = formData.get("doctorId");
+  const lawyerId = formData.get("lawyerId");
   const suspend = formData.get("suspend") === "true";
 
-  if (!doctorId) {
-    throw new Error("Doctor ID is required");
+  if (!lawyerId) {
+    throw new Error("Lawyer ID is required");
   }
 
   try {
@@ -128,7 +128,7 @@ export async function updateDoctorActiveStatus(formData) {
 
     await db.user.update({
       where: {
-        id: doctorId,
+        id: lawyerId,
       },
       data: {
         verificationStatus: status,
@@ -138,8 +138,8 @@ export async function updateDoctorActiveStatus(formData) {
     revalidatePath("/admin");
     return { success: true };
   } catch (error) {
-    console.error("Failed to update doctor active status:", error);
-    throw new Error(`Failed to update doctor status: ${error.message}`);
+    console.error("Failed to update lawyer active status:", error);
+    throw new Error(`Failed to update lawyer status: ${error.message}`);
   }
 }
 
@@ -156,7 +156,7 @@ export async function getPendingPayouts() {
         status: "PROCESSING",
       },
       include: {
-        doctor: {
+        lawyer: {
           select: {
             id: true,
             name: true,
@@ -179,7 +179,7 @@ export async function getPendingPayouts() {
 }
 
 /**
- * Approves a payout request and deducts credits from doctor's account
+ * Approves a payout request and deducts credits from lawyer's account
  */
 export async function approvePayout(formData) {
   const isAdmin = await verifyAdmin();
@@ -205,7 +205,7 @@ export async function approvePayout(formData) {
         status: "PROCESSING",
       },
       include: {
-        doctor: true,
+        lawyer: true,
       },
     });
 
@@ -213,9 +213,9 @@ export async function approvePayout(formData) {
       throw new Error("Payout request not found or already processed");
     }
 
-    // Check if doctor has enough credits
-    if (payout.doctor.credits < payout.credits) {
-      throw new Error("Doctor doesn't have enough credits for this payout");
+    // Check if lawyer has enough credits
+    if (payout.lawyer.credits < payout.credits) {
+      throw new Error("Lawyer doesn't have enough credits for this payout");
     }
 
     // Process the payout in a transaction
@@ -232,10 +232,10 @@ export async function approvePayout(formData) {
         },
       });
 
-      // Deduct credits from doctor's account
+      // Deduct credits from lawyer's account
       await tx.user.update({
         where: {
-          id: payout.doctorId,
+          id: payout.lawyerId,
         },
         data: {
           credits: {
@@ -247,7 +247,7 @@ export async function approvePayout(formData) {
       // Create a transaction record for the deduction
       await tx.creditTransaction.create({
         data: {
-          userId: payout.doctorId,
+          userId: payout.lawyerId,
           amount: -payout.credits,
           type: "ADMIN_ADJUSTMENT",
         },

@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "UserRole" AS ENUM ('UNASSIGNED', 'PATIENT', 'DOCTOR', 'ADMIN');
+CREATE TYPE "UserRole" AS ENUM ('UNASSIGNED', 'CLIENT', 'LAWYER', 'ADMIN');
 
 -- CreateEnum
 CREATE TYPE "VerificationStatus" AS ENUM ('PENDING', 'VERIFIED', 'REJECTED');
@@ -36,7 +36,7 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Availability" (
     "id" TEXT NOT NULL,
-    "doctorId" TEXT NOT NULL,
+    "lawyerId" TEXT NOT NULL,
     "startTime" TIMESTAMP(3) NOT NULL,
     "endTime" TIMESTAMP(3) NOT NULL,
     "status" "SlotStatus" NOT NULL DEFAULT 'AVAILABLE',
@@ -47,12 +47,12 @@ CREATE TABLE "Availability" (
 -- CreateTable
 CREATE TABLE "Appointment" (
     "id" TEXT NOT NULL,
-    "patientId" TEXT NOT NULL,
-    "doctorId" TEXT NOT NULL,
+    "clientId" TEXT NOT NULL,
+    "lawyerId" TEXT NOT NULL,
     "availabilityId" TEXT,
     "status" "AppointmentStatus" NOT NULL DEFAULT 'SCHEDULED',
     "notes" TEXT,
-    "patientDescription" TEXT,
+    "clientDescription" TEXT,
     "videoSessionId" TEXT,
     "videoSessionToken" TEXT,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -93,7 +93,7 @@ CREATE UNIQUE INDEX "User_clerkUserId_key" ON "User"("clerkUserId");
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 
 -- CreateIndex
-CREATE INDEX "Availability_doctorId_startTime_idx" ON "Availability"("doctorId", "startTime");
+CREATE INDEX "Availability_lawyerId_startTime_idx" ON "Availability"("lawyerId", "startTime");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Appointment_availabilityId_key" ON "Appointment"("availabilityId");
@@ -102,13 +102,13 @@ CREATE UNIQUE INDEX "Appointment_availabilityId_key" ON "Appointment"("availabil
 CREATE INDEX "Appointment_status_createdAt_idx" ON "Appointment"("status", "createdAt");
 
 -- AddForeignKey
-ALTER TABLE "Availability" ADD CONSTRAINT "Availability_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Availability" ADD CONSTRAINT "Availability_lawyerId_fkey" FOREIGN KEY ("lawyerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_patientId_fkey" FOREIGN KEY ("patientId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_clientId_fkey" FOREIGN KEY ("clientId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_doctorId_fkey" FOREIGN KEY ("doctorId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_lawyerId_fkey" FOREIGN KEY ("lawyerId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Appointment" ADD CONSTRAINT "Appointment_availabilityId_fkey" FOREIGN KEY ("availabilityId") REFERENCES "Availability"("id") ON DELETE SET NULL ON UPDATE CASCADE;

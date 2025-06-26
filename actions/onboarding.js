@@ -23,28 +23,28 @@ export async function setUserRole(formData) {
 
   const role = formData.get("role");
 
-  if (!role || !["PATIENT", "DOCTOR"].includes(role)) {
+  if (!role || !["CLIENT", "LAWYER"].includes(role)) {
     throw new Error("Invalid role selection");
   }
 
   try {
-    // For patient role - simple update
-    if (role === "PATIENT") {
+    // For client role - simple update
+    if (role === "CLIENT") {
       await db.user.update({
         where: {
           clerkUserId: userId,
         },
         data: {
-          role: "PATIENT",
+          role: "CLIENT",
         },
       });
 
       revalidatePath("/");
-      return { success: true, redirect: "/doctors" };
+      return { success: true, redirect: "/lawyers" };
     }
 
-    // For doctor role - need additional information
-    if (role === "DOCTOR") {
+    // For lawyer role - need additional information
+    if (role === "LAWYER") {
       const specialty = formData.get("specialty");
       const experience = parseInt(formData.get("experience"), 10);
       const credentialUrl = formData.get("credentialUrl");
@@ -60,7 +60,7 @@ export async function setUserRole(formData) {
           clerkUserId: userId,
         },
         data: {
-          role: "DOCTOR",
+          role: "LAWYER",
           specialty,
           experience,
           credentialUrl,
@@ -70,7 +70,7 @@ export async function setUserRole(formData) {
       });
 
       revalidatePath("/");
-      return { success: true, redirect: "/doctor/verification" };
+      return { success: true, redirect: "/lawyer/verification" };
     }
   } catch (error) {
     console.error("Failed to set user role:", error);

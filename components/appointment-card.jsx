@@ -10,7 +10,7 @@ import {
   Clock,
   User,
   Video,
-  Stethoscope,
+  Gavel,
   X,
   Edit,
   Loader2,
@@ -29,7 +29,7 @@ import {
   cancelAppointment,
   addAppointmentNotes,
   markAppointmentCompleted,
-} from "@/actions/doctor";
+} from "@/actions/lawyer";
 import { generateVideoToken } from "@/actions/appointments";
 import useFetch from "@/hooks/use-fetch";
 import { toast } from "sonner";
@@ -87,7 +87,7 @@ export function AppointmentCard({
 
   // Check if appointment can be marked as completed
   const canMarkCompleted = () => {
-    if (userRole !== "DOCTOR" || appointment.status !== "SCHEDULED") {
+    if (userRole !== "LAWYER" || appointment.status !== "SCHEDULED") {
       return false;
     }
     const now = new Date();
@@ -136,9 +136,9 @@ export function AppointmentCard({
     }
   };
 
-  // Handle save notes (doctor only)
+  // Handle save notes (lawyer only)
   const handleSaveNotes = async () => {
-    if (notesLoading || userRole !== "DOCTOR") return;
+    if (notesLoading || userRole !== "LAWYER") return;
 
     const formData = new FormData();
     formData.append("appointmentId", appointment.id);
@@ -221,10 +221,10 @@ export function AppointmentCard({
 
   // Determine other party information based on user role
   const otherParty =
-    userRole === "DOCTOR" ? appointment.patient : appointment.doctor;
+    userRole === "LAWYER" ? appointment.client : appointment.lawyer;
 
-  const otherPartyLabel = userRole === "DOCTOR" ? "Patient" : "Doctor";
-  const otherPartyIcon = userRole === "DOCTOR" ? <User /> : <Stethoscope />;
+  const otherPartyLabel = userRole === "LAWYER" ? "Client" : "Lawyer";
+  const otherPartyIcon = userRole === "LAWYER" ? <User /> : <Gavel />;
 
   return (
     <>
@@ -237,16 +237,16 @@ export function AppointmentCard({
               </div>
               <div>
                 <h3 className="font-medium text-white">
-                  {userRole === "DOCTOR"
+                  {userRole === "LAWYER"
                     ? otherParty.name
                     : `Dr. ${otherParty.name}`}
                 </h3>
-                {userRole === "DOCTOR" && (
+                {userRole === "LAWYER" && (
                   <p className="text-sm text-muted-foreground">
                     {otherParty.email}
                   </p>
                 )}
-                {userRole === "PATIENT" && (
+                {userRole === "CLIENT" && (
                   <p className="text-sm text-muted-foreground">
                     {otherParty.specialty}
                   </p>
@@ -272,8 +272,7 @@ export function AppointmentCard({
                     ? "bg-emerald-900/20 border-emerald-900/30 text-emerald-400"
                     : appointment.status === "CANCELLED"
                     ? "bg-red-900/20 border-red-900/30 text-red-400"
-                    : "bg-amber-900/20 border-amber-900/30 text-amber-400"
-                }
+                    : "bg-amber-900/20 border-amber-900/30 text-amber-400"                }
               >
                 {appointment.status}
               </Badge>
@@ -335,16 +334,16 @@ export function AppointmentCard({
                 </div>
                 <div>
                   <p className="text-white font-medium">
-                    {userRole === "DOCTOR"
+                    {userRole === "LAWYER"
                       ? otherParty.name
                       : `Dr. ${otherParty.name}`}
                   </p>
-                  {userRole === "DOCTOR" && (
+                  {userRole === "LAWYER" && (
                     <p className="text-muted-foreground text-sm">
                       {otherParty.email}
                     </p>
                   )}
-                  {userRole === "PATIENT" && (
+                  {userRole === "CLIENT" && (
                     <p className="text-muted-foreground text-sm">
                       {otherParty.specialty}
                     </p>
@@ -387,24 +386,24 @@ export function AppointmentCard({
                     ? "bg-emerald-900/20 border-emerald-900/30 text-emerald-400"
                     : appointment.status === "CANCELLED"
                     ? "bg-red-900/20 border-red-900/30 text-red-400"
-                    : "bg-amber-900/20 border-amber-900/30 text-amber-400"
+                    : "bg-emerald-900/20 border-emerald-900/30 text-emerald-400"
                 }
               >
                 {appointment.status}
               </Badge>
             </div>
 
-            {/* Patient Description */}
-            {appointment.patientDescription && (
+            {/* Client Description */}
+            {appointment.clientDescription && (
               <div className="space-y-2">
                 <h4 className="text-sm font-medium text-muted-foreground">
-                  {userRole === "DOCTOR"
-                    ? "Patient Description"
+                  {userRole === "LAWYER"
+                    ? "Client Description"
                     : "Your Description"}
                 </h4>
                 <div className="p-3 rounded-md bg-muted/20 border border-emerald-900/20">
                   <p className="text-white whitespace-pre-line">
-                    {appointment.patientDescription}
+                    {appointment.clientDescription}
                   </p>
                 </div>
               </div>
@@ -440,13 +439,13 @@ export function AppointmentCard({
               </div>
             )}
 
-            {/* Doctor Notes (Doctor can view/edit, Patient can only view) */}
+            {/* Lawyer Notes (Lawyer can view/edit, Client can only view) */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <h4 className="text-sm font-medium text-muted-foreground">
-                  Doctor Notes
+                  Lawyer Notes
                 </h4>
-                {userRole === "DOCTOR" &&
+                {userRole === "LAWYER" &&
                   action !== "notes" &&
                   appointment.status !== "CANCELLED" && (
                     <Button
@@ -461,7 +460,7 @@ export function AppointmentCard({
                   )}
               </div>
 
-              {userRole === "DOCTOR" && action === "notes" ? (
+              {userRole === "LAWYER" && action === "notes" ? (
                 <div className="space-y-3">
                   <Textarea
                     value={notes}
@@ -518,7 +517,7 @@ export function AppointmentCard({
 
           <DialogFooter className="flex flex-col-reverse sm:flex-row sm:justify-between sm:space-x-2">
             <div className="flex gap-2">
-              {/* Mark as Complete Button - Only for doctors */}
+              {/* Mark as Complete Button - Only for lawyers */}
               {canMarkCompleted() && (
                 <Button
                   onClick={handleMarkCompleted}

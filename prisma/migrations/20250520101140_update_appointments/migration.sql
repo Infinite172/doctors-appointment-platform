@@ -24,4 +24,4 @@ ADD COLUMN     "startTime" TIMESTAMP(3) NOT NULL;
 CREATE INDEX "Appointment_status_startTime_idx" ON "Appointment"("status", "startTime");
 
 -- CreateIndex
-CREATE INDEX "Appointment_doctorId_startTime_idx" ON "Appointment"("doctorId", "startTime");
+CREATE INDEX "Appointment_lawyerId_startTime_idx" ON "Appointment"("lawyerId", "startTime");

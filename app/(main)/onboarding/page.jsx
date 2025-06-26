@@ -11,7 +11,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { User, Stethoscope, Loader2 } from "lucide-react";
+import { User, Gavel, Loader2 } from "lucide-react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { setUserRole } from "@/actions/onboarding";
-import { doctorFormSchema } from "@/lib/schema";
+import { lawyerFormSchema } from "@/lib/schema";
 import { SPECIALTIES } from "@/lib/specialities";
 import useFetch from "@/hooks/use-fetch";
 import { useEffect } from "react";
@@ -43,7 +43,7 @@ export default function OnboardingPage() {
     setValue,
     watch,
   } = useForm({
-    resolver: zodResolver(doctorFormSchema),
+    resolver: zodResolver(lawyerFormSchema),
     defaultValues: {
       specialty: "",
       experience: undefined,
@@ -55,12 +55,12 @@ export default function OnboardingPage() {
   // Watch specialty value for controlled select component
   const specialtyValue = watch("specialty");
 
-  // Handle patient role selection
-  const handlePatientSelection = async () => {
+  // Handle client role selection
+  const handleClientSelection = async () => {
     if (loading) return;
 
     const formData = new FormData();
-    formData.append("role", "PATIENT");
+    formData.append("role", "CLIENT");
 
     await submitUserRole(formData);
   };
@@ -71,12 +71,12 @@ export default function OnboardingPage() {
     }
   }, [data]);
 
-  // Added missing onDoctorSubmit function
-  const onDoctorSubmit = async (data) => {
+  // Added missing onLawyerSubmit function
+  const onLawyerSubmit = async (data) => {
     if (loading) return;
 
     const formData = new FormData();
-    formData.append("role", "DOCTOR");
+    formData.append("role", "LAWYER");
     formData.append("specialty", data.specialty);
     formData.append("experience", data.experience.toString());
     formData.append("credentialUrl", data.credentialUrl);
@@ -91,18 +91,18 @@ export default function OnboardingPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card
           className="border-emerald-900/20 hover:border-emerald-700/40 cursor-pointer transition-all"
-          onClick={() => !loading && handlePatientSelection()}
+          onClick={() => !loading && handleClientSelection()}
         >
           <CardContent className="pt-6 pb-6 flex flex-col items-center text-center">
             <div className="p-4 bg-emerald-900/20 rounded-full mb-4">
               <User className="h-8 w-8 text-emerald-400" />
             </div>
             <CardTitle className="text-xl font-semibold text-white mb-2">
-              Join as a Patient
+              Join as a Client
             </CardTitle>
             <CardDescription className="mb-4">
-              Book appointments, consult with doctors, and manage your
-              healthcare journey
+              Book appointments, consult with lawyers, and resolve your legal
+              concerns
             </CardDescription>
             <Button
               className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700"
@@ -114,7 +114,7 @@ export default function OnboardingPage() {
                   Processing...
                 </>
               ) : (
-                "Continue as Patient"
+                "Continue as Client"
               )}
             </Button>
           </CardContent>
@@ -122,14 +122,14 @@ export default function OnboardingPage() {
 
         <Card
           className="border-emerald-900/20 hover:border-emerald-700/40 cursor-pointer transition-all"
-          onClick={() => !loading && setStep("doctor-form")}
+          onClick={() => !loading && setStep("lawyer-form")}
         >
           <CardContent className="pt-6 pb-6 flex flex-col items-center text-center">
             <div className="p-4 bg-emerald-900/20 rounded-full mb-4">
-              <Stethoscope className="h-8 w-8 text-emerald-400" />
+              <Gavel className="h-8 w-8 text-emerald-400" />
             </div>
             <CardTitle className="text-xl font-semibold text-white mb-2">
-              Join as a Doctor
+              Join as a Lawyer
             </CardTitle>
             <CardDescription className="mb-4">
               Create your professional profile, set your availability, and
@@ -139,7 +139,7 @@ export default function OnboardingPage() {
               className="w-full mt-2 bg-emerald-600 hover:bg-emerald-700"
               disabled={loading}
             >
-              Continue as Doctor
+              Continue as Lawyer
             </Button>
           </CardContent>
         </Card>
@@ -147,23 +147,23 @@ export default function OnboardingPage() {
     );
   }
 
-  // Doctor registration form
-  if (step === "doctor-form") {
+  // Lawyer registration form
+  if (step === "lawyer-form") {
     return (
       <Card className="border-emerald-900/20">
         <CardContent className="pt-6">
           <div className="mb-6">
             <CardTitle className="text-2xl font-bold text-white mb-2">
-              Complete Your Doctor Profile
+              Complete Your Lawyer Profile
             </CardTitle>
             <CardDescription>
               Please provide your professional details for verification
             </CardDescription>
           </div>
 
-          <form onSubmit={handleSubmit(onDoctorSubmit)} className="space-y-6">
+          <form onSubmit={handleSubmit(onLawyerSubmit)} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="specialty">Medical Specialty</Label>
+              <Label htmlFor="specialty">Lawyer Specialty</Label>
               <Select
                 value={specialtyValue}
                 onValueChange={(value) => setValue("specialty", value)}
@@ -211,7 +211,7 @@ export default function OnboardingPage() {
               <Input
                 id="credentialUrl"
                 type="url"
-                placeholder="https://example.com/my-medical-degree.pdf"
+                placeholder="https://example.com/my-law-degree.pdf"
                 {...register("credentialUrl")}
               />
               {errors.credentialUrl && (
@@ -220,7 +220,7 @@ export default function OnboardingPage() {
                 </p>
               )}
               <p className="text-sm text-muted-foreground">
-                Please provide a link to your medical degree or certification
+                Please provide a link to your law degree or certification
               </p>
             </div>
 
@@ -228,7 +228,7 @@ export default function OnboardingPage() {
               <Label htmlFor="description">Description of Your Services</Label>
               <Textarea
                 id="description"
-                placeholder="Describe your expertise, services, and approach to patient care..."
+                placeholder="Describe your expertise, services, and approach to clients..."
                 rows="4"
                 {...register("description")}
               />

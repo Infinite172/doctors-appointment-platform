@@ -1,4 +1,4 @@
-import { getPatientAppointments } from "@/actions/patient";
+import { getClientAppointments } from "@/actions/clients";
 import { AppointmentCard } from "@/components/appointment-card";
 import { PageHeader } from "@/components/page-header";
 import { Calendar } from "lucide-react";
@@ -6,22 +6,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/actions/onboarding";
 
-export default async function PatientAppointmentsPage() {
+export default async function ClientAppointmentsPage() {
   const user = await getCurrentUser();
 
-  if (!user || user.role !== "PATIENT") {
+  if (!user || user.role !== "CLIENT") {
     redirect("/onboarding");
   }
 
-  const { appointments, error } = await getPatientAppointments();
+  const { appointments, error } = await getClientAppointments();
 
   return (
     <div className="container mx-auto px-4 py-8">
       <PageHeader
         icon={<Calendar />}
         title="My Appointments"
-        backLink="/doctors"
-        backLabel="Find Doctors"
+        backLink="/lawyers"
+        backLabel="Find Lawyers"
       />
 
       <Card className="border-emerald-900/20">
@@ -42,7 +42,7 @@ export default async function PatientAppointmentsPage() {
                 <AppointmentCard
                   key={appointment.id}
                   appointment={appointment}
-                  userRole="PATIENT"
+                  userRole="CLIENT"
                 />
               ))}
             </div>
@@ -54,7 +54,7 @@ export default async function PatientAppointmentsPage() {
               </h3>
               <p className="text-muted-foreground">
                 You don&apos;t have any appointments scheduled yet. Browse our
-                doctors and book your first consultation.
+                lawyers and book your first consultation.
               </p>
             </div>
           )}

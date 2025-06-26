@@ -6,7 +6,7 @@ import { revalidatePath } from "next/cache";
 
 const CREDIT_VALUE = 10; // $10 per credit total
 const PLATFORM_FEE_PER_CREDIT = 2; // $2 platform fee
-const DOCTOR_EARNINGS_PER_CREDIT = 8; // $8 to doctor
+const LAWYER_EARNINGS_PER_CREDIT = 8; // $8 to lawyer
 
 /**
  * Request payout for all remaining credits
@@ -19,15 +19,15 @@ export async function requestPayout(formData) {
   }
 
   try {
-    const doctor = await db.user.findUnique({
+    const lawyer = await db.user.findUnique({
       where: {
         clerkUserId: userId,
-        role: "DOCTOR",
+        role: "LAWYER",
       },
     });
 
-    if (!doctor) {
-      throw new Error("Doctor not found");
+    if (!lawyer) {
+      throw new Error("Lawyer not found");
     }
 
     const paypalEmail = formData.get("paypalEmail");
@@ -36,10 +36,10 @@ export async function requestPayout(formData) {
       throw new Error("PayPal email is required");
     }
 
-    // Check if doctor has any pending payout requests
+    // Check if lawyer has any pending payout requests
     const existingPendingPayout = await db.payout.findFirst({
       where: {
-        doctorId: doctor.id,
+        lawyerId: lawyer.id,
         status: "PROCESSING",
       },
     });
@@ -50,8 +50,8 @@ export async function requestPayout(formData) {
       );
     }
 
-    // Get doctor's current credit balance
-    const creditCount = doctor.credits;
+    // Get lawyer's current credit balance
+    const creditCount = lawyer.credits;
 
     if (creditCount === 0) {
       throw new Error("No credits available for payout");
@@ -63,12 +63,12 @@ export async function requestPayout(formData) {
 
     const totalAmount = creditCount * CREDIT_VALUE;
     const platformFee = creditCount * PLATFORM_FEE_PER_CREDIT;
-    const netAmount = creditCount * DOCTOR_EARNINGS_PER_CREDIT;
+    const netAmount = creditCount * LAWYER_EARNINGS_PER_CREDIT;
 
     // Create payout request
     const payout = await db.payout.create({
       data: {
-        doctorId: doctor.id,
+        lawyerId: lawyer.id,
         amount: totalAmount,
         credits: creditCount,
         platformFee,
@@ -78,7 +78,7 @@ export async function requestPayout(formData) {
       },
     });
 
-    revalidatePath("/doctor");
+    revalidatePath("/lawyer");
     return { success: true, payout };
   } catch (error) {
     console.error("Failed to request payout:", error);
@@ -87,9 +87,9 @@ export async function requestPayout(formData) {
 }
 
 /**
- * Get doctor's payout history
+ * Get lawyer's payout history
  */
-export async function getDoctorPayouts() {
+export async function getLawyerPayouts() {
   const { userId } = await auth();
 
   if (!userId) {
@@ -97,20 +97,20 @@ export async function getDoctorPayouts() {
   }
 
   try {
-    const doctor = await db.user.findUnique({
+    const lawyer = await db.user.findUnique({
       where: {
         clerkUserId: userId,
-        role: "DOCTOR",
+        role: "LAWYER",
       },
     });
 
-    if (!doctor) {
-      throw new Error("Doctor not found");
+    if (!lawyer) {
+      throw new Error("Lawyer not found");
     }
 
     const payouts = await db.payout.findMany({
       where: {
-        doctorId: doctor.id,
+        lawyerId: lawyer.id,
       },
       orderBy: {
         createdAt: "desc",
@@ -124,9 +124,9 @@ export async function getDoctorPayouts() {
 }
 
 /**
- * Get doctor's earnings summary
+ * Get lawyer's earnings summary
  */
-export async function getDoctorEarnings() {
+export async function getLawyerEarnings() {
   const { userId } = await auth();
 
   if (!userId) {
@@ -134,21 +134,21 @@ export async function getDoctorEarnings() {
   }
 
   try {
-    const doctor = await db.user.findUnique({
+    const lawyer = await db.user.findUnique({
       where: {
         clerkUserId: userId,
-        role: "DOCTOR",
+        role: "LAWYER",
       },
     });
 
-    if (!doctor) {
-      throw new Error("Doctor not found");
+    if (!lawyer) {
+      throw new Error("Lawyer not found");
     }
 
-    // Get all completed appointments for this doctor
+    // Get all completed appointments for this lawyer
     const completedAppointments = await db.appointment.findMany({
       where: {
-        doctorId: doctor.id,
+        lawyerId: lawyer.id,
         status: "COMPLETED",
       },
     });
@@ -162,12 +162,12 @@ export async function getDoctorEarnings() {
       (appointment) => new Date(appointment.createdAt) >= currentMonth
     );
 
-    // Use doctor's actual credits from the user model
-    const totalEarnings = doctor.credits * DOCTOR_EARNINGS_PER_CREDIT; // $8 per credit to doctor
+    // Use lawyer's actual credits from the user model
+    const totalEarnings = lawyer.credits * LAWYER_EARNINGS_PER_CREDIT; // $8 per credit to lawyer
 
     // Calculate this month's earnings (2 credits per appointment * $8 per credit)
     const thisMonthEarnings =
-      thisMonthAppointments.length * 2 * DOCTOR_EARNINGS_PER_CREDIT;
+      thisMonthAppointments.length * 2 * LAWYER_EARNINGS_PER_CREDIT;
 
     // Simple average per month calculation
     const averageEarningsPerMonth =
@@ -176,8 +176,8 @@ export async function getDoctorEarnings() {
         : 0;
 
     // Get current credit balance for payout calculations
-    const availableCredits = doctor.credits;
-    const availablePayout = availableCredits * DOCTOR_EARNINGS_PER_CREDIT;
+    const availableCredits = lawyer.credits;
+    const availablePayout = availableCredits * LAWYER_EARNINGS_PER_CREDIT;
 
     return {
       earnings: {
@@ -190,6 +190,6 @@ export async function getDoctorEarnings() {
       },
     };
   } catch (error) {
-    throw new Error("Failed to fetch doctor earnings: " + error.message);
+    throw new Error("Failed to fetch lawyer earnings: " + error.message);
   }
 }

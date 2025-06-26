@@ -23,7 +23,7 @@ export function PageHeader({
         <Button
           variant="outline"
           size="sm"
-          className="mb-2 border-emerald-900/30"
+          className="mb-2 cursor-pointer border-emerald-900/30"
         >
           <ArrowLeft className="h-4 w-4 mr-2" />
           {backLabel}

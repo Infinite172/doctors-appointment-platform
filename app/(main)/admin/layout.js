@@ -5,8 +5,8 @@ import { ShieldCheck, AlertCircle, Users, CreditCard } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 
 export const metadata = {
-  title: "Admin Settings - MediMeet",
-  description: "Manage doctors, patients, and platform settings",
+  title: "Admin Settings - eWakil",
+  description: "Manage lawyers, clients, and platform settings",
 };
 
 export default async function AdminLayout({ children }) {
@@ -36,11 +36,11 @@ export default async function AdminLayout({ children }) {
             <span>Pending Verification</span>
           </TabsTrigger>
           <TabsTrigger
-            value="doctors"
+            value="lawyers"
             className="flex-1 md:flex md:items-center md:justify-start md:px-4 md:py-3 w-full"
           >
             <Users className="h-4 w-4 mr-2 hidden md:inline" />
-            <span>Doctors</span>
+            <span>Lawyers</span>
           </TabsTrigger>
           <TabsTrigger
             value="payouts"

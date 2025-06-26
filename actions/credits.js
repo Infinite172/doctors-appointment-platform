@@ -25,8 +25,8 @@ export async function checkAndAllocateCredits(user) {
       return null;
     }
 
-    // Only allocate credits for patients
-    if (user.role !== "PATIENT") {
+    // Only allocate credits for clients
+    if (user.role !== "CLIENT") {
       return user;
     }
 
@@ -106,7 +106,7 @@ export async function checkAndAllocateCredits(user) {
     });
 
     // Revalidate relevant paths to reflect updated credit balance
-    revalidatePath("/doctors");
+    revalidatePath("/lawyers");
     revalidatePath("/appointments");
 
     return updatedUser;
@@ -122,14 +122,14 @@ export async function checkAndAllocateCredits(user) {
 /**
  * Deducts credits for booking an appointment
  */
-export async function deductCreditsForAppointment(userId, doctorId) {
+export async function deductCreditsForAppointment(userId, lawyerId) {
   try {
     const user = await db.user.findUnique({
       where: { id: userId },
     });
 
-    const doctor = await db.user.findUnique({
-      where: { id: doctorId },
+    const lawyer = await db.user.findUnique({
+      where: { id: lawyerId },
     });
 
     // Ensure user has sufficient credits
@@ -137,13 +137,13 @@ export async function deductCreditsForAppointment(userId, doctorId) {
       throw new Error("Insufficient credits to book an appointment");
     }
 
-    if (!doctor) {
-      throw new Error("Doctor not found");
+    if (!lawyer) {
+      throw new Error("Lawyer not found");
     }
 
-    // Deduct credits from patient and add to doctor
+    // Deduct credits from client and add to lawyer
     const result = await db.$transaction(async (tx) => {
-      // Create transaction record for patient (deduction)
+      // Create transaction record for client (deduction)
       await tx.creditTransaction.create({
         data: {
           userId: user.id,
@@ -152,16 +152,16 @@ export async function deductCreditsForAppointment(userId, doctorId) {
         },
       });
 
-      // Create transaction record for doctor (addition)
+      // Create transaction record for lawyer (addition)
       await tx.creditTransaction.create({
         data: {
-          userId: doctor.id,
+          userId: lawyer.id,
           amount: APPOINTMENT_CREDIT_COST,
           type: "APPOINTMENT_DEDUCTION", // Using same type for consistency
         },
       });
 
-      // Update patient's credit balance (decrement)
+      // Update client's credit balance (decrement)
       const updatedUser = await tx.user.update({
         where: {
           id: user.id,
@@ -173,10 +173,10 @@ export async function deductCreditsForAppointment(userId, doctorId) {
         },
       });
 
-      // Update doctor's credit balance (increment)
+      // Update lawyer's credit balance (increment)
       await tx.user.update({
         where: {
-          id: doctor.id,
+          id: lawyer.id,
         },
         data: {
           credits: {

@@ -2,8 +2,8 @@ import { getCurrentUser } from "@/actions/onboarding";
 import { redirect } from "next/navigation";
 
 export const metadata = {
-  title: "Onboarding - MediMeet",
-  description: "Complete your profile to get started with MediMeet",
+  title: "Onboarding - eWakil",
+  description: "Complete your profile to get started with eWakil",
 };
 
 export default async function OnboardingLayout({ children }) {
@@ -12,14 +12,14 @@ export default async function OnboardingLayout({ children }) {
 
   // Redirect users who have already completed onboarding
   if (user) {
-    if (user.role === "PATIENT") {
-      redirect("/doctors");
-    } else if (user.role === "DOCTOR") {
-      // Check verification status for doctors
+    if (user.role === "CLIENT") {
+      redirect("/lawyers");
+    } else if (user.role === "LAWYER") {
+      // Check verification status for lawyers
       if (user.verificationStatus === "VERIFIED") {
-        redirect("/doctor");
+        redirect("/lawyer");
       } else {
-        redirect("/doctor/verification");
+        redirect("/lawyer/verification");
       }
     } else if (user.role === "ADMIN") {
       redirect("/admin");
@@ -31,7 +31,7 @@ export default async function OnboardingLayout({ children }) {
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-white mb-2">
-            Welcome to MediMeet
+            Welcome to eWakil
           </h1>
           <p className="text-muted-foreground text-lg">
             Tell us how you want to use the platform

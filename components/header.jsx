@@ -4,33 +4,34 @@ import {
   Calendar,
   CreditCard,
   ShieldCheck,
-  Stethoscope,
+  Gavel,
   User,
+  Scale,
 } from "lucide-react";
 import Link from "next/link";
 import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
 import { checkUser } from "@/lib/checkUser";
 import { Badge } from "./ui/badge";
 import { checkAndAllocateCredits } from "@/actions/credits";
-import Image from "next/image";
 
 export default async function Header() {
   const user = await checkUser();
-  if (user?.role === "PATIENT") {
+  if (user?.role === "CLIENT") {
     await checkAndAllocateCredits(user);
   }
 
   return (
     <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-10 supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-2 cursor-pointer">
-          <Image
-            src="/logo-single.png"
-            alt="Medimeet Logo"
-            width={200}
+        <Link href="/" className="flex items-center cursor-pointer">
+          <Scale
+            // src="/logo-single.png"
+            alt="eWakil"
+            width={60}
             height={60}
-            className="h-10 w-auto object-contain"
+            className="h-10 object-contain text-emerald-400"
           />
+          <p className="text-emerald-400 font-bold text-2xl hidden sm:block whitespace-nowrap">eWakil</p>
         </Link>
 
         {/* Action Buttons */}
@@ -52,33 +53,33 @@ export default async function Header() {
               </Link>
             )}
 
-            {/* Doctor Links */}
-            {user?.role === "DOCTOR" && (
-              <Link href="/doctor">
+            {/* Lawyer Links */}
+            {user?.role === "LAWYER" && (
+              <Link href="/lawyer">
                 <Button
                   variant="outline"
-                  className="hidden md:inline-flex items-center gap-2"
+                  className="hidden md:inline-flex items-center gap-2 cursor-pointer"
                 >
-                  <Stethoscope className="h-4 w-4" />
-                  Doctor Dashboard
+                  <Gavel className="h-4 w-4" />
+                  Lawyer Dashboard
                 </Button>
                 <Button variant="ghost" className="md:hidden w-10 h-10 p-0">
-                  <Stethoscope className="h-4 w-4" />
+                  <Gavel className="h-4 w-4" />
                 </Button>
               </Link>
             )}
 
-            {/* Patient Links */}
-            {user?.role === "PATIENT" && (
-              <Link href="/appointments">
+            {/* Client Links */}
+            {user?.role === "CLIENT" && (
+              <Link className="cursor-pointer" href="/appointments">
                 <Button
                   variant="outline"
-                  className="hidden md:inline-flex items-center gap-2"
+                  className="hidden cursor-pointer md:inline-flex items-center gap-2"
                 >
                   <Calendar className="h-4 w-4" />
                   My Appointments
                 </Button>
-                <Button variant="ghost" className="md:hidden w-10 h-10 p-0">
+                <Button variant="ghost" className="md:hidden cursor-pointer w-10 h-10 p-0">
                   <Calendar className="h-4 w-4" />
                 </Button>
               </Link>
@@ -102,10 +103,10 @@ export default async function Header() {
           </SignedIn>
 
           {(!user || user?.role !== "ADMIN") && (
-            <Link href={user?.role === "PATIENT" ? "/pricing" : "/doctor"}>
+          <Link href={!user || user.role === "LAWYER" ? "/lawyer" : "/pricing"}>
               <Badge
                 variant="outline"
-                className="h-9 bg-emerald-900/20 border-emerald-700/30 px-3 py-1 flex items-center gap-2"
+                className="h-9 bg-emerald-900/20 border-emerald-700/30 px-3 py-1 cursor-default flex items-center gap-2"
               >
                 <CreditCard className="h-3.5 w-3.5 text-emerald-400" />
                 <span className="text-emerald-400">
@@ -113,7 +114,7 @@ export default async function Header() {
                     <>
                       {user.credits}{" "}
                       <span className="hidden md:inline">
-                        {user?.role === "PATIENT"
+                        {user?.role === "CLIENT"
                           ? "Credits"
                           : "Earned Credits"}
                       </span>

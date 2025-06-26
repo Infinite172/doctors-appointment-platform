@@ -17,7 +17,7 @@ const options = {};
 const vonage = new Vonage(credentials, options);
 
 /**
- * Book a new appointment with a doctor
+ * Book a new appointment with a lawyer
  */
 export async function bookAppointment(formData) {
   const { userId } = await auth();
@@ -27,51 +27,51 @@ export async function bookAppointment(formData) {
   }
 
   try {
-    // Get the patient user
-    const patient = await db.user.findUnique({
+    // Get the client user
+    const client = await db.user.findUnique({
       where: {
         clerkUserId: userId,
-        role: "PATIENT",
+        role: "CLIENT",
       },
     });
 
-    if (!patient) {
-      throw new Error("Patient not found");
+    if (!client) {
+      throw new Error("Client not found");
     }
 
     // Parse form data
-    const doctorId = formData.get("doctorId");
+    const lawyerId = formData.get("lawyerId");
     const startTime = new Date(formData.get("startTime"));
     const endTime = new Date(formData.get("endTime"));
-    const patientDescription = formData.get("description") || null;
+    const clientDescription = formData.get("description") || null;
 
     // Validate input
-    if (!doctorId || !startTime || !endTime) {
-      throw new Error("Doctor, start time, and end time are required");
+    if (!lawyerId || !startTime || !endTime) {
+      throw new Error("Lawyer, start time, and end time are required");
     }
 
-    // Check if the doctor exists and is verified
-    const doctor = await db.user.findUnique({
+    // Check if the lawyer exists and is verified
+    const lawyer = await db.user.findUnique({
       where: {
-        id: doctorId,
-        role: "DOCTOR",
+        id: lawyerId,
+        role: "LAWYER",
         verificationStatus: "VERIFIED",
       },
     });
 
-    if (!doctor) {
-      throw new Error("Doctor not found or not verified");
+    if (!lawyer) {
+      throw new Error("Lawyer not found or not verified");
     }
 
-    // Check if the patient has enough credits (2 credits per appointment)
-    if (patient.credits < 2) {
+    // Check if the client has enough credits (2 credits per appointment)
+    if (client.credits < 2) {
       throw new Error("Insufficient credits to book an appointment");
     }
 
     // Check if the requested time slot is available
     const overlappingAppointment = await db.appointment.findFirst({
       where: {
-        doctorId: doctorId,
+        lawyerId: lawyerId,
         status: "SCHEDULED",
         OR: [
           {
@@ -112,10 +112,10 @@ export async function bookAppointment(formData) {
     // Create a new Vonage Video API session
     const sessionId = await createVideoSession();
 
-    // Deduct credits from patient and add to doctor
+    // Deduct credits from client and add to lawyer
     const { success, error } = await deductCreditsForAppointment(
-      patient.id,
-      doctor.id
+      client.id,
+      lawyer.id
     );
 
     if (!success) {
@@ -125,11 +125,11 @@ export async function bookAppointment(formData) {
     // Create the appointment with the video session ID
     const appointment = await db.appointment.create({
       data: {
-        patientId: patient.id,
-        doctorId: doctor.id,
+        clientId: client.id,
+        lawyerId: lawyer.id,
         startTime,
         endTime,
-        patientDescription,
+        clientDescription,
         status: "SCHEDULED",
         videoSessionId: sessionId, // Store the Vonage session ID
       },
@@ -157,7 +157,7 @@ async function createVideoSession() {
 
 /**
  * Generate a token for a video session
- * This will be called when either doctor or patient is about to join the call
+ * This will be called when either lawyer or client is about to join the call
  */
 export async function generateVideoToken(formData) {
   const { userId } = await auth();
@@ -194,8 +194,8 @@ export async function generateVideoToken(formData) {
       throw new Error("Appointment not found");
     }
 
-    // Verify the user is either the doctor or the patient for this appointment
-    if (appointment.doctorId !== user.id && appointment.patientId !== user.id) {
+    // Verify the user is either the lawyer or the client for this appointment
+    if (appointment.lawyerId !== user.id && appointment.clientId !== user.id) {
       throw new Error("You are not authorized to join this call");
     }
 
@@ -230,7 +230,7 @@ export async function generateVideoToken(formData) {
 
     // Generate the token with appropriate role and expiration
     const token = vonage.video.generateClientToken(appointment.videoSessionId, {
-      role: "publisher", // Both doctor and patient can publish streams
+      role: "publisher", // Both lawyer and client can publish streams
       expireTime: expirationTime,
       data: connectionData,
     });
@@ -257,68 +257,68 @@ export async function generateVideoToken(formData) {
 }
 
 /**
- * Get doctor by ID
+ * Get lawyer by ID
  */
-export async function getDoctorById(doctorId) {
+export async function getLawyerById(lawyerId) {
   try {
-    const doctor = await db.user.findUnique({
+    const lawyer = await db.user.findUnique({
       where: {
-        id: doctorId,
-        role: "DOCTOR",
+        id: lawyerId,
+        role: "LAWYER",
         verificationStatus: "VERIFIED",
       },
     });
 
-    if (!doctor) {
-      throw new Error("Doctor not found");
+    if (!lawyer) {
+      throw new Error("Lawyer not found");
     }
 
-    return { doctor };
+    return { lawyer };
   } catch (error) {
-    console.error("Failed to fetch doctor:", error);
-    throw new Error("Failed to fetch doctor details");
+    console.error("Failed to fetch lawyer:", error);
+    throw new Error("Failed to fetch lawyer details");
   }
 }
 
 /**
  * Get available time slots for booking for the next 4 days
  */
-export async function getAvailableTimeSlots(doctorId) {
+export async function getAvailableTimeSlots(lawyerId) {
   try {
-    // Validate doctor existence and verification
-    const doctor = await db.user.findUnique({
+    // Validate lawyer existence and verification
+    const lawyer = await db.user.findUnique({
       where: {
-        id: doctorId,
-        role: "DOCTOR",
+        id: lawyerId,
+        role: "LAWYER",
         verificationStatus: "VERIFIED",
       },
     });
 
-    if (!doctor) {
-      throw new Error("Doctor not found or not verified");
+    if (!lawyer) {
+      throw new Error("Lawyer not found or not verified");
     }
 
     // Fetch a single availability record
     const availability = await db.availability.findFirst({
       where: {
-        doctorId: doctor.id,
+        lawyerId: lawyer.id,
         status: "AVAILABLE",
       },
     });
 
     if (!availability) {
-      throw new Error("No availability set by doctor");
+      throw new Error("No availability set by lawyer");
     }
 
     // Get the next 4 days
     const now = new Date();
     const days = [now, addDays(now, 1), addDays(now, 2), addDays(now, 3)];
 
-    // Fetch existing appointments for the doctor over the next 4 days
+    // Fetch existing appointments for the lawyer over the next 4 days
     const lastDay = endOfDay(days[3]);
     const existingAppointments = await db.appointment.findMany({
       where: {
-        doctorId: doctor.id,
+        lawyerId: lawyer.id,
         status: "SCHEDULED",
         startTime: {
           lte: lastDay,

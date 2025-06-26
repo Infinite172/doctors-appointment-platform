@@ -6,11 +6,11 @@
 
 */
 -- DropIndex
-DROP INDEX "Payout_doctorId_month_year_key";
+DROP INDEX "Payout_lawyerId_month_year_key";
 
 -- AlterTable
 ALTER TABLE "Payout" DROP COLUMN "month",
 DROP COLUMN "year";
 
 -- CreateIndex
-CREATE INDEX "Payout_doctorId_status_idx" ON "Payout"("doctorId", "status");
+CREATE INDEX "Payout_lawyerId_status_idx" ON "Payout"("lawyerId", "status");

@@ -14,7 +14,7 @@ import {
   User,
   DollarSign,
   Mail,
-  Stethoscope,
+  Gavel,
   Loader2,
   AlertCircle,
 } from "lucide-react";
@@ -83,7 +83,7 @@ export function PendingPayouts({ payouts }) {
             Pending Payouts
           </CardTitle>
           <CardDescription>
-            Review and approve doctor payout requests
+            Review and approve lawyer payout requests
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -106,10 +106,10 @@ export function PendingPayouts({ payouts }) {
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium text-white">
-                            Dr. {payout.doctor.name}
+                            Dr. {payout.lawyer.name}
                           </h3>
                           <p className="text-sm text-muted-foreground">
-                            {payout.doctor.specialty}
+                            {payout.lawyer.specialty}
                           </p>
                           <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-muted-foreground">
                             <div className="flex items-center">
@@ -138,7 +138,7 @@ export function PendingPayouts({ payouts }) {
                       <div className="flex flex-col sm:flex-row gap-2 self-end lg:self-center">
                         <Badge
                           variant="outline"
-                          className="bg-amber-900/20 border-amber-900/30 text-amber-400 w-fit"
+                          className="bg-emerald-900/20 border-emerald-900/30 text-emerald-400 w-fit"
                         >
                           Pending
                         </Badge>
@@ -184,11 +184,11 @@ export function PendingPayouts({ payouts }) {
             </DialogHeader>
 
             <div className="space-y-6 py-4">
-              {/* Doctor Information */}
+              {/* Lawyer Information */}
               <div className="space-y-4">
                 <div className="flex items-center gap-2">
-                  <Stethoscope className="h-5 w-5 text-emerald-400" />
-                  <h3 className="text-white font-medium">Doctor Information</h3>
+                  <Gavel className="h-5 w-5 text-emerald-400" />
+                  <h3 className="text-white font-medium">Lawyer Information</h3>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
@@ -196,21 +196,21 @@ export function PendingPayouts({ payouts }) {
                       Name
                     </p>
                     <p className="text-white">
-                      Dr. {selectedPayout.doctor.name}
+                      Dr. {selectedPayout.lawyer.name}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Email
                     </p>
-                    <p className="text-white">{selectedPayout.doctor.email}</p>
+                    <p className="text-white">{selectedPayout.lawyer.email}</p>
                   </div>
                   <div>
                     <p className="text-sm font-medium text-muted-foreground">
                       Specialty
                     </p>
                     <p className="text-white">
-                      {selectedPayout.doctor.specialty}
+                      {selectedPayout.lawyer.specialty}
                     </p>
                   </div>
                   <div>
@@ -218,7 +218,7 @@ export function PendingPayouts({ payouts }) {
                       Current Credits
                     </p>
                     <p className="text-white">
-                      {selectedPayout.doctor.credits}
+                      {selectedPayout.lawyer.credits}
                     </p>
                   </div>
                 </div>
@@ -271,12 +271,12 @@ export function PendingPayouts({ payouts }) {
               </div>
 
               {/* Warning if insufficient credits */}
-              {selectedPayout.doctor.credits < selectedPayout.credits && (
+              {selectedPayout.lawyer.credits < selectedPayout.credits && (
                 <Alert variant="destructive">
                   <AlertCircle className="h-4 w-4" />
                   <AlertDescription>
-                    Warning: Doctor currently has only{" "}
-                    {selectedPayout.doctor.credits} credits but this payout
+                    Warning: Lawyer currently has only{" "}
+                    {selectedPayout.lawyer.credits} credits but this payout
                     requires {selectedPayout.credits} credits. The payout cannot
                     be processed.
                   </AlertDescription>
@@ -295,7 +295,7 @@ export function PendingPayouts({ payouts }) {
               <Button
                 onClick={() => handleApprovePayout(selectedPayout)}
                 disabled={
-                  selectedPayout.doctor.credits < selectedPayout.credits
+                  selectedPayout.lawyer.credits < selectedPayout.credits
                 }
                 className="bg-emerald-600 hover:bg-emerald-700"
               >
@@ -331,7 +331,7 @@ export function PendingPayouts({ payouts }) {
                   <ul className="mt-2 space-y-1 list-disc pl-4">
                     <li>
                       Deduct {selectedPayout.credits} credits from Dr.{" "}
-                      {selectedPayout.doctor.name}'s account
+                      {selectedPayout.lawyer.name}'s account
                     </li>
                     <li>Mark the payout as PROCESSED</li>
                     <li>This action cannot be undone</li>
@@ -341,9 +341,9 @@ export function PendingPayouts({ payouts }) {
 
               <div className="bg-muted/20 p-4 rounded-lg border border-emerald-900/20">
                 <div className="flex justify-between mb-2">
-                  <span className="text-muted-foreground">Doctor:</span>
+                  <span className="text-muted-foreground">Lawyer:</span>
                   <span className="text-white">
-                    Dr. {selectedPayout.doctor.name}
+                    Dr. {selectedPayout.lawyer.name}
                   </span>
                 </div>
                 <div className="flex justify-between mb-2">
