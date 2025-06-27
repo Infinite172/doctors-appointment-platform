@@ -21,7 +21,7 @@ export default async function Header() {
   }
 
   return (
-    <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-10 supports-[backdrop-filter]:bg-background/60">
+    <header className="fixed top-0 w-full border-b bg-background/80 backdrop-blur-md z-20 supports-[backdrop-filter]:bg-background/60">
       <nav className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link href="/" className="flex items-center cursor-pointer">
           <Scale
@@ -39,10 +39,11 @@ export default async function Header() {
           <SignedIn>
             {/* Admin Links */}
             {user?.role === "ADMIN" && (
+              <div className="hidden md:block">
               <Link href="/admin">
                 <Button
                   variant="outline"
-                  className="hidden md:inline-flex items-center gap-2"
+                  className="items-center gap-2"
                 >
                   <ShieldCheck className="h-4 w-4" />
                   Admin Dashboard
@@ -51,22 +52,22 @@ export default async function Header() {
                   <ShieldCheck className="h-4 w-4" />
                 </Button>
               </Link>
+              </div>
             )}
 
             {/* Lawyer Links */}
             {user?.role === "LAWYER" && (
-              <Link href="/lawyer">
-                <Button
-                  variant="outline"
-                  className="hidden md:inline-flex items-center gap-2 cursor-pointer"
-                >
-                  <Gavel className="h-4 w-4" />
-                  Lawyer Dashboard
-                </Button>
-                <Button variant="ghost" className="md:hidden w-10 h-10 p-0">
-                  <Gavel className="h-4 w-4" />
-                </Button>
-              </Link>
+              <div className="hidden md:block">
+                <Link href="/lawyer">
+                  <Button
+                    variant="outline"
+                    className="inline-flex items-center gap-2 cursor-pointer"
+                  >
+                    <Gavel className="h-4 w-4" />
+                    Lawyer Dashboard
+                  </Button>
+                </Link>
+              </div>
             )}
 
             {/* Client Links */}
@@ -103,7 +104,7 @@ export default async function Header() {
           </SignedIn>
 
           {(!user || user?.role !== "ADMIN") && (
-          <Link href={!user || user.role === "LAWYER" ? "/lawyer" : "/pricing"}>
+          <Link href={!user || user?.role === "LAWYER" ? "" : "/pricing"}>
               <Badge
                 variant="outline"
                 className="h-9 bg-emerald-900/20 border-emerald-700/30 px-3 py-1 cursor-default flex items-center gap-2"
@@ -113,7 +114,7 @@ export default async function Header() {
                   {user && user.role !== "ADMIN" ? (
                     <>
                       {user.credits}{" "}
-                      <span className="hidden md:inline">
+                      <span className="">
                         {user?.role === "CLIENT"
                           ? "Credits"
                           : "Earned Credits"}

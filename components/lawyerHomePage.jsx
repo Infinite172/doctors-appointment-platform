@@ -7,6 +7,7 @@ import { Button } from "./ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import Questions from "@/components/questions";
+import { Gavel } from "lucide-react";
 
 export default async function LawyerHomePage() {
   const user = await checkUser();
@@ -36,15 +37,28 @@ export default async function LawyerHomePage() {
                 View upcoming sessions, provide legal guidance, and grow your
                 practice through our secure platform.
               </p>
+
+              <div className="flex flex-col sm:flex-row gap-4">
+                <Button
+                  asChild
+                  size="lg"
+                  className="bg-emerald-600 text-white hover:bg-emerald-700 md:hidden"
+                >
+                <Link href="/lawyer">
+                  <Gavel className="h-4 w-4" />
+                  DashBoard
+                </Link>
+                </Button>
               <Button
-                                asChild
-                                variant="outline"
-                                size="lg"
-                                className="border-emerald-700/30 hover:bg-muted/80"
-                              >
-                                <Link href="/lawyers">Find Lawyers</Link>
-                              </Button>
+                asChild
+                variant="outline"
+                size="lg"
+                className="border-emerald-700/30 hover:bg-muted/80"
+                >
+              <Link href="/lawyers">Find Lawyers</Link>
+              </Button>
             </div>
+          </div>
 
             <div className="relative h-[400px] lg:h-[500px] rounded-xl overflow-hidden">
               <Image

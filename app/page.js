@@ -49,7 +49,7 @@ export default async function Home() {
                     size="lg"
                     className="bg-emerald-600 text-white hover:bg-emerald-700"
                   >
-                  <Link href="/onboarding">
+                  <Link href="/sign-up">
                     Get Started <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
                     </Button>

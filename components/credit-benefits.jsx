@@ -8,7 +8,7 @@ export default async function CreditBenefits() {
     const user = await checkUser();
 
     // Set benefits based on role
-    const isAdminOrNoUser = user?.role === 'ADMIN' || !user;
+    const isAdminOrNoUser = user?.role === 'ADMIN' || user?.role === 'UNASSIGNED' || !user;
     const isTwoColumn = isAdminOrNoUser;
 
     let leftBenefits = [];

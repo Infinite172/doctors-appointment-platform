@@ -7,7 +7,8 @@ import CreditBenefits from "@/components/credit-benefits";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import Testimonials from "@/components/testimonials";
-import HomePricing from "@/components/home-pricing";
+import { ShieldCheck } from "lucide-react";
+
 
 export default async function AdminHomePage() {
   const user = await checkUser();
@@ -36,7 +37,19 @@ export default async function AdminHomePage() {
               <p className="text-muted-foreground text-lg md:text-xl max-w-md">
                 Oversee users, lawyers, credits, appointments, and all platform operations.
               </p>
-              <Button
+              <div className="flex flex-col sm:flex-row gap-4">
+                  <Button
+                    asChild
+                    size="lg"
+                    className="bg-emerald-600 text-white hover:bg-emerald-700 md:hidden"
+                  >
+                  <Link href="/admin">
+                  <ShieldCheck className="h-4 w-4" />
+                    DashBoard
+                  </Link>
+                    </Button>
+
+                <Button
                   asChild
                   variant="outline"
                   size="lg"
@@ -44,6 +57,7 @@ export default async function AdminHomePage() {
                 >
                   <Link href="/lawyers">View Lawyers</Link>
                 </Button>
+              </div>
             </div>
 
             <div className="relative h-[400px] lg:h-[500px] rounded-xl overflow-hidden">
@@ -93,8 +107,6 @@ export default async function AdminHomePage() {
           </div>
         </div>
       </section>
-
-        <HomePricing />
 
         <Testimonials />
     

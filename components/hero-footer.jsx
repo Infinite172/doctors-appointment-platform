@@ -2,8 +2,10 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Scale } from "lucide-react";
 import Link from "next/link";
+import { checkUser } from "@/lib/checkUser";
 
 export default async function HeroFooter() {
+  const user = await checkUser();
     return (
 <section className="py-20">
   <div className="container mx-auto px-4">
@@ -20,6 +22,7 @@ export default async function HeroFooter() {
               journey with our platform. Get started today and experience
               law the way it should be.
             </p>
+            {!user?.role && (
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 asChild
@@ -37,6 +40,7 @@ export default async function HeroFooter() {
                 <Link href="/pricing">View Pricing</Link>
               </Button>
             </div>
+            )}
           </div>
 
           {/* Image Section - Hidden on smaller than lg */}

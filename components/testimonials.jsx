@@ -4,6 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { testimonials } from "@/lib/data";
 
 export default function Testimonials() {
+  return (
     <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
@@ -52,4 +53,4 @@ export default function Testimonials() {
           </div>
         </div>
       </section>
-}
+)}
