@@ -70,7 +70,7 @@ export default function OnboardingPage() {
     if (loading) return;
 
     const formData = new FormData();
-    formData.append("role", "PATIENT");
+    formData.append("role", "CLIENT");
 
     await submitUserRole(formData);
   };
