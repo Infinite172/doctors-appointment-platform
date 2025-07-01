@@ -1,8 +1,10 @@
 import { getLawyerById, getAvailableTimeSlots } from "@/actions/appointments";
 import { LawyerProfile } from "./_components/lawyer-profile";
 import { redirect } from "next/navigation";
+import { checkUser } from "@/lib/checkUser";
 
 export default async function LawyerProfilePage({ params }) {
+  const user = await checkUser();
   const { id } = await params;
 
   try {
@@ -14,6 +16,7 @@ export default async function LawyerProfilePage({ params }) {
 
     return (
       <LawyerProfile
+        user={user?.role}
         lawyer={lawyerData.lawyer}
         availableDays={slotsData.days || []}
       />

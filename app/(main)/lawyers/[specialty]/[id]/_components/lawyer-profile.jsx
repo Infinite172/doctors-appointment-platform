@@ -28,7 +28,7 @@ import { SlotPicker } from "./slot-picker";
 import { AppointmentForm } from "./appointment-form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-export function LawyerProfile({ lawyer, availableDays }) {
+export function LawyerProfile({ user, lawyer, availableDays }) {
   const [showBooking, setShowBooking] = useState(false);
   const [selectedSlot, setSelectedSlot] = useState(null);
   const router = useRouter();
@@ -100,22 +100,24 @@ export function LawyerProfile({ lawyer, availableDays }) {
                   </span>
                 </div>
 
-                <Button
-                  onClick={toggleBooking}
-                  className="w-full bg-emerald-600 hover:bg-emerald-700 mt-4"
-                >
-                  {showBooking ? (
-                    <>
-                      Hide Booking
-                      <ChevronUp className="ml-2 h-4 w-4" />
-                    </>
-                  ) : (
-                    <>
-                      Book Appointment
-                      <ChevronDown className="ml-2 h-4 w-4" />
-                    </> 
-                  )}
-                </Button>
+                {user === "CLIENT" && (
+                  <Button
+                    onClick={toggleBooking}
+                    className="w-full bg-emerald-600 hover:bg-emerald-700 mt-4"
+                  >
+                    {showBooking ? (
+                      <>
+                        Hide Booking
+                        <ChevronUp className="ml-2 h-4 w-4" />
+                      </>
+                    ) : (
+                      <>
+                        Book Appointment
+                        <ChevronDown className="ml-2 h-4 w-4" />
+                      </>
+                    )}
+                  </Button>
+                )}
               </div>
             </CardContent>
           </Card>
