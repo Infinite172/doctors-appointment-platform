@@ -50,7 +50,6 @@ export default function OnboardingPage() {
   });
 
   const specialtyValue = watch("specialty");
-  const credentialUrl = watch("credentialUrl");
 
   useEffect(() => {
     if (data && data?.success) {
@@ -66,6 +65,15 @@ export default function OnboardingPage() {
       toast.error("Cloudinary config missing");
       return null;
     }
+
+  const handleClientSelection = async () => {
+    if (loading) return;
+
+    const formData = new FormData();
+    formData.append("role", "PATIENT");
+
+    await submitUserRole(formData);
+  };
 
     const formData = new FormData();
     formData.append("file", file);
