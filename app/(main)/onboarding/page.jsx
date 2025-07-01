@@ -50,6 +50,7 @@ export default function OnboardingPage() {
   });
 
   const specialtyValue = watch("specialty");
+  const credentialUrl = watch("credentialUrl");
 
   useEffect(() => {
     if (data && data?.success) {
@@ -65,15 +66,6 @@ export default function OnboardingPage() {
       toast.error("Cloudinary config missing");
       return null;
     }
-
-  const handleClientSelection = async () => {
-    if (loading) return;
-
-    const formData = new FormData();
-    formData.append("role", "CLIENT");
-
-    await submitUserRole(formData);
-  };
 
     const formData = new FormData();
     formData.append("file", file);
@@ -96,6 +88,15 @@ export default function OnboardingPage() {
       toast.error("Failed to upload credential document");
       return null;
     }
+  };
+
+  const handleClientSelection = async () => {
+    if (loading) return;
+
+    const formData = new FormData();
+    formData.append("role", "CLIENT");
+
+    await submitUserRole(formData);
   };
 
   const onFileChange = async (e) => {
@@ -191,6 +192,7 @@ export default function OnboardingPage() {
               <Label htmlFor="credentialFile">Upload Credential Document</Label>
               <Input type="file" id="credentialFile" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={onFileChange} />
               {errors.credentialUrl && <p className="text-sm font-medium text-red-500 mt-1">{errors.credentialUrl.message}</p>}
+              <p>{credentialUrl}</p>
               <p className="text-sm text-muted-foreground">Upload your law degree or certification</p>
             </div>
 
